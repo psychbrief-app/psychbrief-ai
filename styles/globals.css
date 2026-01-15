@@ -40,3 +40,12 @@ a {
     color-scheme: dark;
   }
 }
+.search-box {
+  background: white;
+  color: #111;
+}
+.search-box {
+  background-color: #ffffff !important;
+  color: #111 !important;
+  border: 1px solid #ccc;
+}
