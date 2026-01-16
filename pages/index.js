@@ -4,8 +4,8 @@ import { supabase } from "../lib/supabase";
 export default function Home() {
 
   // ---- DATA ----
-  const maxHomepageCards = 10;
-  const maxArchiveCards = 5;
+  const maxHomepageCards = 24;
+  const maxArchiveCards = 50;
 
   const categoryIcons = {
     Mood: "☀️",
