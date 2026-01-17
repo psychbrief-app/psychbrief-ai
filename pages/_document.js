@@ -4,11 +4,11 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-  <meta
-    name="google-site-verification"
-    content=<meta name="google-site-verification" content="FVnoFdKGKu5AdsRrFRPzS6E-0GenOpJJMfcQoXdJqJs" />
-  />
-</Head>
+        <meta
+          name="google-site-verification"
+          content="FVnoFdKGKu5AdsRrFRPzS6E-0GenOpJJMfcQoXdJqJs"
+        />
+      </Head>
       <body>
         <Main />
         <NextScript />
