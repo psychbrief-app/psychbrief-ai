@@ -1,40 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Psych Brief
 
-## Getting Started
+**Psych Brief** is a clinical psychiatry research intelligence site that surfaces recent, high-signal mental health studies in a clean, readable format.
 
-First, run the development server:
+The project is designed for clinicians, researchers, and mental health professionals who want fast access to actionable findings without wading through full abstracts.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## What Psych Brief Does
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+- Continuously ingests recent psychiatry-relevant studies from PubMed
+- Filters for clinical relevance and actionability
+- Extracts structured study details (population, arms, findings, safety, takeaway)
+- Presents results in a concise, card-based interface
+- Automatically archives older studies while keeping the homepage focused
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+---
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## Study Coverage
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Current focus areas include:
 
-## Learn More
+- Mood disorders (e.g., major depression, bipolar disorder)
+- Anxiety and trauma-related disorders
+- Psychotic disorders
+- Neurodevelopmental disorders
+- Sleep-wake disorders
 
-To learn more about Next.js, take a look at the following resources:
+Study types include clinical trials, secondary analyses, observational studies, and meta-analyses.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
+- **Frontend:** Next.js (Pages Router)
+- **Backend:** Vercel serverless functions
+- **Database:** Supabase (PostgreSQL)
+- **Data Source:** PubMed (NCBI E-utilities)
+- **Deployment:** Vercel
+- **Analytics:** Vercel Analytics
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## Status
+
+Psych Brief is an active, evolving project.  
+Functionality, coverage, and presentation are expected to expand over time.
+
+---
+
+## Author
+
+Designed and maintained by  
+**C. Patrick, PhD**
+
+📧 Contact: cpatrick035@gmail.com
