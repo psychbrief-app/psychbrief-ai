@@ -2,8 +2,12 @@ export default async function handler(req, res) {
   try {
     console.log("🔵 PubMed ingestion started");
 
+const proto = req.headers["x-forwarded-proto"] || "https";
+const host = req.headers["x-forwarded-host"] || req.headers.host;
+const baseUrl = `${proto}://${host}`;
+
     async function isClinicallyRelevant(abstract) {
-  const resp = await fetch("http://localhost:3000/api/relevance", {
+  const resp = await fetch(`${baseUrl}/api/relevance`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ abstract }),
@@ -163,36 +167,46 @@ for (const a of articles) {
     continue;
   }
 
-  // 🔍 Actionability check
-  const actionResp = await fetch("http://localhost:3000/api/actionability", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ abstract }),
-  });
+ // 🔍 Actionability check
+const actionResp = await fetch(`${baseUrl}/api/actionability`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ abstract }),
+});
 
-  const actionResult = await actionResp.json();
-  if (!actionResult.actionable) {
-    console.log("⛔ Skipped non-actionable study:", actionResult.reason);
-    continue;
-  }
+// 🚨 FAIL FAST if the internal API call itself failed
+if (!actionResp.ok) {
+  throw new Error(`Actionability API failed: ${actionResp.status}`);
+}
+
+const actionResult = await actionResp.json();
+
+if (!actionResult.actionable) {
+  console.log("⛔ Skipped non-actionable study:", actionResult.reason);
+  continue;
+}
 
   // ✅ Send abstract + trusted PubMed metadata into /extract
-  const extractResp = await fetch("http://localhost:3000/api/extract", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      abstract,
-      pmid: a.pmid,
-      title: a.title,
-      journal: a.journal,
-      journal_abbrev: a.journal_abbrev,
-      doi: a.doi,
-      authors: a.authors,
-    }),
-  });
+  const extractResp = await fetch(`${baseUrl}/api/extract`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    abstract,
+    pmid: a.pmid,
+    title: a.title,
+    journal: a.journal,
+    journal_abbrev: a.journal_abbrev,
+    doi: a.doi,
+    authors: a.authors,
+  }),
+});
 
-  const extractResult = await extractResp.json();
-  results.push(extractResult);
+if (!extractResp.ok) {
+  throw new Error(`Extract API failed: ${extractResp.status}`);
+}
+
+const extractResult = await extractResp.json();
+results.push(extractResult);
 }
 
 // ✅ respond AFTER the loop finishes
