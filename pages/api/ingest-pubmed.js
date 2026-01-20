@@ -49,7 +49,7 @@ const baseUrl = `${proto}://${host}`;
       " OR stroke OR fibromyalgia OR \"restless legs\"" +
     ")" +
   ")" +
-  "&retmax=30" +
+  "&retmax=45" +
   "&sort=pub+date" +
   "&reldate=60" +
   "&datetype=pdat" +
