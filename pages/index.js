@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 export default function Home() {
 
   // ---- DATA ----
-  const maxHomepageCards = 24;
+  const maxHomepageCards = 100;
   const maxArchiveCards = 50;
 
   const categoryIcons = {
