@@ -359,14 +359,12 @@ function escapeRegExp(s) {
  * Order matters: arms -> findings -> takeaway (you can include more fields too).
  */
 function normalizeAcronymsAcrossCard(parts) {
-  // acr -> full (as first seen)
-  const acrToFull = new Map();
-  // lower(full) -> acr
-  const fullToAcr = new Map();
+  const acrToFull = new Map(); // acr -> full (first seen)
+  const fullToAcr = new Map(); // fullLower -> acr
 
-  // Extract patterns like: "cognitive behavioral therapy (CBT)"
-  // ACR: 2–12 chars, mostly caps/digits/hyphen (covers TAU, CBT, HD-tDCS, etc.)
-  const DEF_RE = /([A-Za-z][A-Za-z0-9'’\-\/ ]{2,80}?)\s*\(([A-Z][A-Z0-9\-]{1,11})\)/g;
+  // "cognitive behavioral therapy (CBT)"
+  const DEF_RE =
+    /([A-Za-z][A-Za-z0-9'’\-\/ ]{2,80}?)\s*\(([A-Z][A-Z0-9\-]{1,11})\)/g;
 
   function registerDefinitions(text) {
     if (!text) return;
@@ -384,30 +382,23 @@ function normalizeAcronymsAcrossCard(parts) {
     }
   }
 
-  // Replace repeated defs and full terms based on what's already registered
-  function applyRewrites(text, { allowDefStripping } = { allowDefStripping: true }) {
+  function applyRewrites(text) {
     if (!text) return text;
     let out = String(text);
 
-    // 1) Strip repeated "Full (ACR)" -> "ACR" if ACR already defined earlier
-    if (allowDefStripping && acrToFull.size) {
+    // 1) Replace repeated "Full (ACR)" with "ACR" once ACR has already been defined earlier
+    if (acrToFull.size) {
       out = out.replace(DEF_RE, (match, full, acr) => {
-        const firstFull = acrToFull.get(acr);
-        if (!firstFull) return match; // not tracked
-        // If this is a repeated definition (not the first time we saw it), compress to acronym
-        const normalizedFull = String(full).trim().replace(/\s+/g, " ");
-        if (normalizedFull.toLowerCase() !== firstFull.toLowerCase()) {
-          // different long-form; still treat as repeat and compress
-          return acr;
-        }
-        // same long-form; also compress if it's already in our map (i.e., defined earlier)
+        if (!acrToFull.has(acr)) return match;
+        // already known -> compress to acronym
         return acr;
       });
     }
 
     // 2) Replace long-form with acronym for any previously-defined acronym
-    // Sort by length desc so longer phrases replace first (avoid partial replacements)
-    const pairs = Array.from(fullToAcr.entries()).sort((a, b) => b[0].length - a[0].length);
+    const pairs = Array.from(fullToAcr.entries()).sort(
+      (a, b) => b[0].length - a[0].length
+    );
 
     for (const [fullLower, acr] of pairs) {
       const full = acrToFull.get(acr) || fullLower;
@@ -415,20 +406,22 @@ function normalizeAcronymsAcrossCard(parts) {
       out = out.replace(re, acr);
     }
 
-    // Clean double-spaces created by replacements
-    out = out.replace(/\s{2,}/g, " ").trim();
-    return out;
+    return out.replace(/\s{2,}/g, " ").trim();
   }
 
-  // We process sequentially, registering defs as we go.
+  // Process sequentially: earlier parts define acronyms; later parts use acronyms.
   const out = [];
   for (let i = 0; i < parts.length; i++) {
     const original = parts[i];
 
-    // Before we rewrite this part, rewrite using defs from earlier parts
-    registerDefinitions(original);          // capture first definition
-const rewritten = applyRewrites(original, { allowDefStripping: true });
-out.push(rewritten);
+    // rewrite using definitions seen so far
+    const rewritten = applyRewrites(original);
+
+    // then register any *new* definitions from the original for later parts
+    registerDefinitions(original);
+
+    out.push(rewritten);
+  }
 
   return out;
 }
