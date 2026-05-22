@@ -1,8 +1,9 @@
 export default async function handler(req, res) {
 
-  const token = req.headers["x-cron-secret"];
+  const authHeader = req.headers.authorization || "";
+  const expected = `Bearer ${process.env.CRON_SECRET}`;
 
-  if (token !== process.env.CRON_SECRET) {
+  if (authHeader !== expected) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
@@ -17,7 +18,10 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("Cron ingestion failed:", error);
-    return res.status(500).json({ error: "Cron ingestion failed" });
+
+    return res.status(500).json({
+      error: "Cron ingestion failed"
+    });
   }
 
 }
